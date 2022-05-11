@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class NumberService {
@@ -23,20 +24,34 @@ public class NumberService {
      * @return возвращает случайный номер
      */
     public String getRandomNumber() {
-        Numbers number = numberRepository.findNumberFromRandomSelect();
-        lastId = number.getId();
-        numberRepository.updateFlagByIdEquals(number.getId());
-        return number.getNumber();
+        Optional<Numbers> numbersOptional = Optional.ofNullable(numberRepository.findNumberFromRandomSelect());
+        if (numbersOptional.isPresent()) {
+            lastId = numbersOptional.get().getId();
+            numberRepository.updateFlagByIdEquals(numbersOptional.get().getId());
+            if (lastId == 1728000L) {
+                lastId = 0;
+            }
+            return numbersOptional.get().getNumber();
+        } else {
+            return "Numbers end";
+        }
     }
 
     /**
      * @return возвращает следующий номер
      */
     public String getNextNumber() {
-        Numbers number = numberRepository.findNumberFromRecentSelect(lastId);
-        lastId = number.getId();
-        numberRepository.updateFlagByIdEquals(number.getId());
-        return number.getNumber();
+        Optional<Numbers> numbersOptional = Optional.ofNullable(numberRepository.findNumberFromRecentSelect(lastId));
+        if (numbersOptional.isPresent()) {
+            lastId = numbersOptional.get().getId();
+            numberRepository.updateFlagByIdEquals(numbersOptional.get().getId());
+            if (lastId == 1728000L) {
+                lastId = 0;
+            }
+            return numbersOptional.get().getNumber();
+        } else {
+            return "Numbers end";
+        }
     }
 
     /**
